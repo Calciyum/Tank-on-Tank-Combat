@@ -16,7 +16,7 @@ BLUE = (0, 0, 200)
 LIGHT_BLUE = (175, 175, 250)
 screen = pygame.display.set_mode(SIZE)
 
-#display grids of tanks, walls, shells, and mines.
+#display grid of the walls
 game_grid = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -37,7 +37,27 @@ game_grid = [
 num_rows = len(game_grid)
 num_cols = len(game_grid[0]) if num_rows > 0 else 0
 
+#display grid of players and shells
 attack_grid = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+]
+
+#display grid of mines
+mine_grid = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -84,6 +104,18 @@ class player:
                     if s.row == new_row and s.col == new_col:
                         shells.remove(s)
                         break
+                
+                #check your feet (for mines)
+                for m in mines:
+                    if m.row == new_row and m.col == new_col:
+                        if m.delay > 2:
+                            if self.team == 1:
+                                winner = 2
+                            else:
+                                winner = 1
+                        game_over = True
+                        break
+                
                 #bye bye old position, hello new position
                 attack_grid[self.row][self.col] = 0
                 self.row = new_row
@@ -144,11 +176,22 @@ class shell:
         attack_grid[self.row][self.col] = 3
         return True
 
+#class for mines
+class mine:
+    def __init__(self, row, col, delay, team):
+        self.row = row
+        self.col = col
+        self.delay = delay
+        self.team = team
+
+        mine_grid[self.row][self.col] = team
+
 #instantiate players, Turn variable, and Shell list
 player1 = player(1, 2, 1)
 player2 = player(13, 12, 2)
 Turn = 0
 shells = []
+mines = []
 last_turn = -1
 game_over = False
 winner = None
@@ -208,7 +251,7 @@ while running:
                 else:
                     player2.move(+1, -1)
                 Turn += 1
-            elif event.key == pygame.K_x:
+            elif event.key == pygame.K_s:
                 if Turn % 2 == 0:
                     player1.move(+1, 0)
                 else:
@@ -219,6 +262,15 @@ while running:
                     player1.move(+1, +1)
                 else:
                     player2.move(+1, +1)
+                Turn += 1
+            #mine button
+            elif event.key == pygame.K_SPACE:
+                if Turn % 2 == 0:
+                    m = mine(player1.row, player1.col, 0, 1)
+                    mines.append(m)
+                else:
+                    m = mine(player2.row, player2.col, 0, 2)
+                    mines.append(m)
                 Turn += 1
             #shells x4 directions
             elif event.key == pygame.K_UP:
@@ -261,6 +313,7 @@ while running:
                     if s.active:
                         shells.append(s)
                 Turn += 1
+    #incrementation of offensive stuff
     if Turn != last_turn:
         if Turn % 2 == 0:
             current_team = 1
@@ -274,6 +327,8 @@ while running:
             else:
                 new_shells.append(s)
         shells = new_shells
+        for m in mines:
+            m.delay += 1
         last_turn = Turn
 
     #visual display of game_grid
@@ -305,6 +360,15 @@ while running:
                 # redraw cell border for empty attack cells
                 rect = pygame.Rect(xpos, ypos - HEIGHT/num_cols, WIDTH/num_rows, HEIGHT/num_cols)
                 pygame.draw.rect(screen, BLACK, rect, width=2)
+            if Turn % 2 == 0:
+                current_team = 1
+            else:
+                current_team = 2
+            if mine_grid[i][j] == current_team:
+                if current_team == 1:
+                    pygame.draw.circle(screen, RED, (SQUARE_SIZE * j + SQUARE_SIZE/2, SQUARE_SIZE * i + SQUARE_SIZE/2), WIDTH/(num_rows * 3), width=4)
+                else:
+                    pygame.draw.circle(screen, BLUE, (SQUARE_SIZE * j + SQUARE_SIZE/2, SQUARE_SIZE * i + SQUARE_SIZE/2), WIDTH/(num_rows * 3), width=4)
             xpos += WIDTH/num_rows
         ypos += HEIGHT/num_cols
 
