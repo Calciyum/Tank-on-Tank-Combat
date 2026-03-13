@@ -108,7 +108,7 @@ class player:
                 #check your feet (for mines)
                 for m in mines:
                     if m.row == new_row and m.col == new_col:
-                        if m.delay > 3:
+                        if m.delay > 5:
                             if self.team == 1:
                                 winner = 2
                             else:
@@ -385,7 +385,7 @@ while running:
                 else:
                     pygame.draw.circle(screen, BLUE, (SQUARE_SIZE * j + SQUARE_SIZE/2, SQUARE_SIZE * i + SQUARE_SIZE/2), WIDTH/(num_rows * 3), width=4)
             for m in mines:
-                if m.team == current_team and m.delay > 3:
+                if m.team == current_team and m.delay > 5:
                     if m.team == 1:
                         color = RED
                     else:
