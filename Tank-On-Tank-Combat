@@ -12,9 +12,11 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 TITLE = (200, 200, 200)
 RED = (200, 0 ,0)
-LIGHT_RED = (250, 175, 175)
+LIGHT_RED = (255, 175, 175)
 BLUE = (0, 0, 200)
-LIGHT_BLUE = (175, 175, 250)
+LIGHT_BLUE = (175, 175, 255)
+#RED_TANK = pygame.image.load("Red_Tank.png").convert_alpha
+#BLUE_TANK = pygame.image.load("Blue_Tank.png").convert_alpha
 screen = pygame.display.set_mode(SIZE)
 fade = 255
 fading = False
@@ -81,7 +83,7 @@ mine_grid = [
 ]
 
 #class that represents the player
-class player:
+class player(pygame.sprite.Sprite):
     #intialization function
     def __init__(self, row, col, team):
         self.row = row
