@@ -15,13 +15,15 @@ RED = (200, 0 ,0)
 LIGHT_RED = (255, 175, 175)
 BLUE = (0, 0, 200)
 LIGHT_BLUE = (175, 175, 255)
-#RED_TANK = pygame.image.load("Red_Tank.png").convert_alpha
-#BLUE_TANK = pygame.image.load("Blue_Tank.png").convert_alpha
+#RED_TANK = pygame.image.load("Assets/Red_Tank.png").convert_alpha()
+#BLUE_TANK = pygame.image.load("Assets/Blue_Tank.png").convert_alpha()
 screen = pygame.display.set_mode(SIZE)
 fade = 255
 fading = False
 fade_direction = None
 fade_speed = 2
+font_Large = pygame.font.SysFont(None, 72)
+font_Small = pygame.font.SysFont(None, 40)
 
 #display grid of the walls
 game_grid = [
@@ -94,7 +96,7 @@ class player(pygame.sprite.Sprite):
     
     #movement function
     def move(self, row_change, col_change):
-        global game_over, winner
+        global game_over, winner, cause
         new_row = self.row + row_change
         new_col = self.col + col_change
 
@@ -107,6 +109,7 @@ class player(pygame.sprite.Sprite):
                     else:
                         winner = 1
                     game_over = True
+                    cause = "Shell"
                 for s in shells:
                     if s.row == new_row and s.col == new_col:
                         shells.remove(s)
@@ -121,6 +124,7 @@ class player(pygame.sprite.Sprite):
                             else:
                                 winner = 1
                         game_over = True
+                        cause = "Mine"
                         break
                 
                 #bye bye old position, hello new position
@@ -132,7 +136,7 @@ class player(pygame.sprite.Sprite):
 #class that represents the shells
 class shell:
     def __init__(self, row, col, row_change, col_change, team):
-        global game_over, winner
+        global game_over, winner, cause
         self.row_change = row_change
         self.col_change = col_change
         self.row = row + row_change
@@ -154,16 +158,18 @@ class shell:
             attack_grid[self.row][self.col] = 0
             game_over = True
             winner = 2
+            cause = "Shell"
         
         if attack_grid[self.row][self.col] == 2:
             attack_grid[self.row][self.col] = 0
             game_over = True
             winner = 1
+            cause = "Shell"
         
         attack_grid[self.row][self.col] = 3
     #function for shell traveling
     def move(self):
-        global game_over, winner
+        global game_over, winner, cause
         
         new_row = self.row + self.row_change
         new_col = self.col + self.col_change
@@ -184,12 +190,14 @@ class shell:
             attack_grid[new_row][new_col] = 0
             game_over = True
             winner = 2
+            cause = "Shell"
             return False
         
         if attack_grid[new_row][new_col] == 2:
             attack_grid[new_row][new_col] = 0
             game_over = True
             winner = 1
+            cause = "Shell"
             return False
 
         self.row = new_row
@@ -216,6 +224,7 @@ mines = []
 last_turn = -1
 game_over = False
 winner = None
+cause = None
 next_state = None
 state = "title"
 
@@ -463,6 +472,24 @@ while running:
                         else:
                             color = BLUE
                         pygame.draw.circle(screen, color, (SQUARE_SIZE * m.col + SQUARE_SIZE/2, SQUARE_SIZE * m.row + SQUARE_SIZE/2), WIDTH/(num_rows * 8), width=0)
+
+    #game over display
+    if game_over:
+        if winner == 1:
+            winner_text = "Red Tank Wins!"
+            color = RED
+        elif winner == 2:
+            winner_text = "Blue Tank Wins!"
+            color = BLUE
+        else:
+            winner_text = "It's a Draw!"
+            color = WHITE
+        text = font_Large.render(winner_text, True, color)
+        screen.blit(text, (WIDTH//2 - text.get_width()//2, HEIGHT//2 - 50))
+        cause_text = font_Small.render(f"Cause: {cause}", True, WHITE)
+        screen.blit(cause_text, (WIDTH//2 - cause_text.get_width()//2, HEIGHT//2 + 10))
+        restart_text = font_Small.render("Press Enter to Return to Title or ESC to Quit", True, WHITE)
+        screen.blit(restart_text, (WIDTH//2 - restart_text.get_width()//2, HEIGHT//2 + 50))
 
     #run the fade
     if fading:
