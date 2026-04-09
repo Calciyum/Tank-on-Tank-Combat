@@ -381,40 +381,48 @@ while running:
                 #shells x4 directions
                 elif event.key == pygame.K_UP:
                     if Turn % 2 == 0:
+                        player1.direction = (-1, 0)
                         s = shell(player1.row, player1.col, -1, 0, 1)
                         if s.active:
                             shells.append(s)
                     else:
+                        player2.direction = (-1, 0)
                         s = shell(player2.row, player2.col, -1, 0, 2)
                         if s.active:
                             shells.append(s)
                     Turn += 1
                 elif event.key == pygame.K_LEFT:
                     if Turn % 2 == 0:
+                        player1.direction = (0, -1)
                         s = shell(player1.row, player1.col, 0, -1, 1)
                         if s.active:
                             shells.append(s)
                     else:
+                        player2.direction = (0, -1)
                         s = shell(player2.row, player2.col, 0, -1, 2)
                         if s.active:
                             shells.append(s)
                     Turn += 1
                 elif event.key == pygame.K_RIGHT:
                     if Turn % 2 == 0:
+                        player1.direction = (0, 1)
                         s = shell(player1.row, player1.col, 0, 1, 1)
                         if s.active:
                             shells.append(s)
                     else:
+                        player2.direction = (0, 1)
                         s = shell(player2.row, player2.col, 0, 1, 2)
                         if s.active:
                             shells.append(s)
                     Turn += 1
                 elif event.key == pygame.K_DOWN:
                     if Turn % 2 == 0:
+                        player1.direction = (+1, 0)
                         s = shell(player1.row, player1.col, +1, 0, 1)
                         if s.active:
                             shells.append(s)
                     else:
+                        player2.direction = (+1, 0)
                         s = shell(player2.row, player2.col, +1, 0, 2)
                         if s.active:
                             shells.append(s)
