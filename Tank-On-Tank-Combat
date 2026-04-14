@@ -142,8 +142,8 @@ class player(pygame.sprite.Sprite):
                                 winner = 2
                             else:
                                 winner = 1
-                        game_over = True
-                        cause = "Mine"
+                            game_over = True
+                            cause = "Mine"
                         break
                 
                 #bye bye old position, hello new position
