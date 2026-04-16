@@ -17,6 +17,8 @@ BLUE = (0, 0, 200)
 LIGHT_BLUE = (175, 175, 255)
 screen = pygame.display.set_mode(SIZE)
 tank_size = int(SQUARE_SIZE)
+TITLE_SCREEN = pygame.image.load(r"C:\Users\ceac524\Desktop\TOTC\Assets\TOTC_Title.png").convert_alpha()
+scaled_title = pygame.transform.smoothscale(TITLE_SCREEN, (int(WIDTH * 0.8), int(HEIGHT * 0.8)))
 RED_TANK = pygame.image.load(r"C:\Users\ceac524\Desktop\TOTC\Assets\Red_Tank.png").convert_alpha()
 BLUE_TANK = pygame.image.load(r"C:\Users\ceac524\Desktop\TOTC\Assets\Blue_Tank.png").convert_alpha()
 RED_TANK = pygame.transform.smoothscale(RED_TANK, (tank_size, tank_size))
@@ -450,6 +452,7 @@ while running:
     #fill background for current state
     if state == "title":
         screen.fill(TITLE)
+        screen.blit(scaled_title, (WIDTH//2 - scaled_title.get_width()//2, HEIGHT//2 - scaled_title.get_height()//2))
     elif state == "game":
         if Turn % 2 == 0:
             screen.fill(LIGHT_RED)
