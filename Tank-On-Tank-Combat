@@ -1,6 +1,7 @@
 import pygame
 import sys
 import random
+import math
 
 #initialize pygame
 pygame.init()
@@ -18,11 +19,22 @@ LIGHT_BLUE = (175, 175, 255)
 screen = pygame.display.set_mode(SIZE)
 tank_size = int(SQUARE_SIZE)
 TITLE_SCREEN = pygame.image.load(r"C:\Users\ceac524\Desktop\TOTC\Assets\TOTC_Title.png").convert_alpha()
+bob_time = 0
+bob_speed = 0.001
+bob_height = 20
 scaled_title = pygame.transform.smoothscale(TITLE_SCREEN, (int(WIDTH * 0.8), int(HEIGHT * 0.8)))
 RED_TANK = pygame.image.load(r"C:\Users\ceac524\Desktop\TOTC\Assets\Red_Tank.png").convert_alpha()
 BLUE_TANK = pygame.image.load(r"C:\Users\ceac524\Desktop\TOTC\Assets\Blue_Tank.png").convert_alpha()
 RED_TANK = pygame.transform.smoothscale(RED_TANK, (tank_size, tank_size))
 BLUE_TANK = pygame.transform.smoothscale(BLUE_TANK, (tank_size, tank_size))
+RED_MINE_OFF = pygame.image.load(r"C:\Users\ceac524\Desktop\TOTC\Assets\Red_Mine_Off.png").convert_alpha()
+BLUE_MINE_OFF = pygame.image.load(r"C:\Users\ceac524\Desktop\TOTC\Assets\Blue_Mine_Off.png").convert_alpha()
+RED_MINE_ON = pygame.image.load(r"C:\Users\ceac524\Desktop\TOTC\Assets\Red_Mine_On.png").convert_alpha()
+BLUE_MINE_ON = pygame.image.load(r"C:\Users\ceac524\Desktop\TOTC\Assets\Blue_Mine_On.png").convert_alpha()
+RED_MINE_OFF = pygame.transform.smoothscale(RED_MINE_OFF, (tank_size, tank_size))
+BLUE_MINE_OFF = pygame.transform.smoothscale(BLUE_MINE_OFF, (tank_size, tank_size))
+RED_MINE_ON = pygame.transform.smoothscale(RED_MINE_ON, (tank_size, tank_size))
+BLUE_MINE_ON = pygame.transform.smoothscale(BLUE_MINE_ON, (tank_size, tank_size))
 direction_angles = {
     (-1, 0): 90,
     (1, 0): -90,
@@ -38,6 +50,8 @@ fade = 255
 fading = False
 fade_direction = None
 fade_speed = 2
+text_time = 0
+text_speed = 0.006
 font_Large = pygame.font.SysFont(None, 72)
 font_Small = pygame.font.SysFont(None, 40)
 
@@ -449,10 +463,19 @@ while running:
                 m.delay += 1
         last_turn = Turn
 
-    #fill background for current state
+    #fill background for states
     if state == "title":
         screen.fill(TITLE)
-        screen.blit(scaled_title, (WIDTH//2 - scaled_title.get_width()//2, HEIGHT//2 - scaled_title.get_height()//2))
+        bob_time += bob_speed
+        bob_offset = math.sin(bob_time) * bob_height
+        screen.blit(scaled_title, (WIDTH//2 - scaled_title.get_width()//2, HEIGHT//2 - scaled_title.get_height()//2 + bob_offset - 50))
+
+        text_time += text_speed
+        change = (math.sin(text_time) + 1) / 2 * 255
+        title_text = font_Small.render("Press Enter to Start", True, BLACK)
+        title_text.set_alpha(change)
+        screen.blit(title_text, (WIDTH//2 - title_text.get_width()//2, HEIGHT//2 + scaled_title.get_height()//2 - 15 + bob_offset))
+
     elif state == "game":
         if Turn % 2 == 0:
             screen.fill(LIGHT_RED)
@@ -477,20 +500,41 @@ while running:
         for i in range(num_rows):
             xpos = 0
             for j in range(num_cols):
+                
+                #draw mines
+                for m in mines:
+                    if m.team == current_team:
+                        x = int(SQUARE_SIZE * m.col)
+                        y = int(SQUARE_SIZE * m.row)
+
+                        if m.delay > 5:
+                            if m.team == 1:
+                               screen.blit(RED_MINE_ON, (x, y))
+                            else:
+                                screen.blit(BLUE_MINE_ON, (x, y))
+                        else:
+                            if m.team == 1:
+                                screen.blit(RED_MINE_OFF, (x, y))
+                            else:
+                                screen.blit(BLUE_MINE_OFF, (x, y))
+                
+                #draw player 1
                 if attack_grid[i][j] == 1:
                     angle = direction_angles[player1.direction]
                     rotated = pygame.transform.rotate(RED_TANK, angle)
                     rect = rotated.get_rect(center=(int(SQUARE_SIZE * j + SQUARE_SIZE/2 + 1),
                                     int(SQUARE_SIZE * i + SQUARE_SIZE/2 + 1)))
                     screen.blit(rotated, rect)
-
+                
+                #draw player 2
                 elif attack_grid[i][j] == 2:
                     angle = direction_angles[player2.direction]
                     rotated = pygame.transform.rotate(BLUE_TANK, angle)
                     rect = rotated.get_rect(center=(int(SQUARE_SIZE * j + SQUARE_SIZE/2 + 1),
                                     int(SQUARE_SIZE * i + SQUARE_SIZE/2 + 1)))
                     screen.blit(rotated, rect)
-
+                
+                #draw shells
                 elif attack_grid[i][j] == 3:
                     pygame.draw.circle(screen, BLACK, (SQUARE_SIZE * j + SQUARE_SIZE/2, SQUARE_SIZE * i + SQUARE_SIZE/2), WIDTH/(num_rows * 4), width=0)
                 else:
@@ -500,18 +544,6 @@ while running:
                     current_team = 1
                 else:
                     current_team = 2
-                if mine_grid[i][j] == current_team:
-                    if current_team == 1:
-                        pygame.draw.circle(screen, RED, (SQUARE_SIZE * j + SQUARE_SIZE/2, SQUARE_SIZE * i + SQUARE_SIZE/2), WIDTH/(num_rows * 3), width=4)
-                    else:
-                        pygame.draw.circle(screen, BLUE, (SQUARE_SIZE * j + SQUARE_SIZE/2, SQUARE_SIZE * i + SQUARE_SIZE/2), WIDTH/(num_rows * 3), width=4)
-                for m in mines:
-                    if m.team == current_team and m.delay > 5:
-                        if m.team == 1:
-                            color = RED
-                        else:
-                            color = BLUE
-                        pygame.draw.circle(screen, color, (SQUARE_SIZE * m.col + SQUARE_SIZE/2, SQUARE_SIZE * m.row + SQUARE_SIZE/2), WIDTH/(num_rows * 8), width=0)
 
     #game over display
     if game_over:
