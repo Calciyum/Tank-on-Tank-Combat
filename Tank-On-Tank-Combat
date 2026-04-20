@@ -476,6 +476,10 @@ while running:
         title_text.set_alpha(change)
         screen.blit(title_text, (WIDTH//2 - title_text.get_width()//2, HEIGHT//2 + scaled_title.get_height()//2 - 15 + bob_offset))
 
+        leave_text = font_Small.render("Press ESC to Quit", True, BLACK)
+        leave_text.set_alpha(change)
+        screen.blit(leave_text, (25, 25))
+
     elif state == "game":
         if Turn % 2 == 0:
             screen.fill(LIGHT_RED)
