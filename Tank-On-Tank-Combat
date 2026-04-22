@@ -7,7 +7,7 @@ import math
 pygame.init()
 
 #random constant variables
-SIZE = WIDTH, HEIGHT = 900, 900
+SIZE = WIDTH, HEIGHT = 1050, 1050
 SQUARE_SIZE = WIDTH/15
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -560,11 +560,13 @@ while running:
         else:
             winner_text = "It's a Draw!"
             color = WHITE
+        pygame.draw.rect(screen, TITLE, (WIDTH//2 - 325, HEIGHT//2 - 75, 650, 175))
+        pygame.draw.rect(screen, BLACK, (WIDTH//2 - 325, HEIGHT//2 - 75, 650, 175), width=5)
         text = font_Large.render(winner_text, True, color)
         screen.blit(text, (WIDTH//2 - text.get_width()//2, HEIGHT//2 - 50))
-        cause_text = font_Small.render(f"Cause: {cause}", True, WHITE)
+        cause_text = font_Small.render(f"Cause: {cause}", True, BLACK)
         screen.blit(cause_text, (WIDTH//2 - cause_text.get_width()//2, HEIGHT//2 + 10))
-        restart_text = font_Small.render("Press Enter to Return to Title or ESC to Quit", True, WHITE)
+        restart_text = font_Small.render("Press Enter to Return to Title or ESC to Quit", True, BLACK)
         screen.blit(restart_text, (WIDTH//2 - restart_text.get_width()//2, HEIGHT//2 + 50))
 
     #run the fade
