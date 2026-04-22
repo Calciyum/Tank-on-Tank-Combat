@@ -474,7 +474,7 @@ while running:
         change = (math.sin(text_time) + 1) / 2 * 255
         title_text = font_Small.render("Press Enter to Start", True, BLACK)
         title_text.set_alpha(change)
-        screen.blit(title_text, (WIDTH//2 - title_text.get_width()//2, HEIGHT//2 + scaled_title.get_height()//2 - 15 + bob_offset))
+        screen.blit(title_text, (WIDTH//2 - title_text.get_width()//2, HEIGHT//2 + scaled_title.get_height()//2))
 
         leave_text = font_Small.render("Press ESC to Quit", True, BLACK)
         leave_text.set_alpha(change)
