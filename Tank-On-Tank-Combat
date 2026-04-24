@@ -23,6 +23,10 @@ bob_time = 0
 bob_speed = 0.001
 bob_height = 20
 scaled_title = pygame.transform.smoothscale(TITLE_SCREEN, (int(WIDTH * 0.8), int(HEIGHT * 0.8)))
+TUTORIAL_SCREEN = pygame.image.load(r"C:\Users\ceac524\Desktop\TOTC\Assets\Tutorial.png").convert_alpha()
+scaled_tutorial = pygame.transform.smoothscale(TUTORIAL_SCREEN, (WIDTH, HEIGHT))
+SELECTION_SCREEN = pygame.image.load(r"C:\Users\ceac524\Desktop\TOTC\Assets\Selection.png").convert_alpha()
+scaled_selection = pygame.transform.smoothscale(SELECTION_SCREEN, (WIDTH, HEIGHT))
 RED_TANK = pygame.image.load(r"C:\Users\ceac524\Desktop\TOTC\Assets\Red_Tank.png").convert_alpha()
 BLUE_TANK = pygame.image.load(r"C:\Users\ceac524\Desktop\TOTC\Assets\Blue_Tank.png").convert_alpha()
 RED_TANK = pygame.transform.smoothscale(RED_TANK, (tank_size, tank_size))
@@ -57,21 +61,21 @@ font_Small = pygame.font.SysFont(None, 40)
 
 #display grid of the walls
 game_grid = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1]
 ]
 num_rows = len(game_grid)
 num_cols = len(game_grid[0]) if num_rows > 0 else 0
@@ -251,8 +255,8 @@ class mine:
         mine_grid[self.row][self.col] = team
 
 #instantiate players, Turn variable, and Shell list
-player1 = player(1, 2, 1, (0, 1))
-player2 = player(13, 12, 2, (0, -1))
+player1 = player(2, 2, 1, (0, 1))
+player2 = player(12, 12, 2, (0, -1))
 Turn = 0
 shells = []
 mines = []
@@ -273,25 +277,105 @@ while running:
         if event.type == pygame.KEYDOWN:
             if state == "title":
                 if event.key == pygame.K_RETURN:
-                    
-                    #reset game variables
-                    shells = []
-                    mines = []
-                    Turn = 0
-                    last_turn = -1
-                    game_over = False
-                    winner = None
-
-                    #clear grids
-                    for i in range(num_rows):
-                        for j in range(num_cols):
-                            attack_grid[i][j] = 0
-                            mine_grid[i][j] = 0
-
-                    player1 = player(1, 2, 1, (0, 1))
-                    player2 = player(13, 12, 2, (0, -1))
-
                     #start fade
+                    fading = True
+                    fade_direction = "out"
+                    fade = 0
+                    next_state = "tutorial"
+                elif event.key == pygame.K_ESCAPE:
+                    running = False
+            
+            elif state == "tutorial":
+                if event.key == pygame.K_RETURN:
+                    fading = True
+                    fade_direction = "out"
+                    fade = 0
+                    next_state = "selection"
+                elif event.key == pygame.K_ESCAPE:
+                    running = False
+
+            elif state == "selection":
+                #reset game variables
+                shells = []
+                mines = []
+                Turn = 0
+                last_turn = -1
+                game_over = False
+                winner = None
+
+                #clear grids
+                for i in range(num_rows):
+                    for j in range(num_cols):
+                        attack_grid[i][j] = 0
+                        mine_grid[i][j] = 0
+                if event.key == pygame.K_1:
+                    game_grid = [
+                        [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+                        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                        [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1]
+                    ]
+                    player1 = player(2, 2, 1, (0, 1))
+                    player2 = player(12, 12, 2, (0, -1))
+                    fading = True
+                    fade_direction = "out"
+                    fade = 0
+                    next_state = "game"
+                elif event.key == pygame.K_2:
+                    game_grid = [
+                        [1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1],
+                        [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
+                        [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                        [1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1],
+                        [1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1],
+                        [0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0],
+                        [1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1],
+                        [1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1],
+                        [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                        [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
+                        [1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1]
+                    ]
+                    player1 = player(3, 3, 1, (0, 1))
+                    player2 = player(11, 11, 2, (0, -1))
+                    fading = True
+                    fade_direction = "out"
+                    fade = 0
+                    next_state = "game"
+                elif event.key == pygame.K_3:
+                    game_grid = [
+                        [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1],
+                        [1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1],
+                        [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+                        [1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1],
+                        [1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1],
+                        [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+                        [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+                        [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+                        [1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1],
+                        [1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1],
+                        [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+                        [1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1],
+                        [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1]
+                    ]
+                    player1 = player(7, 0, 1, (0, 1))
+                    player2 = player(7, 14, 2, (0, -1))
                     fading = True
                     fade_direction = "out"
                     fade = 0
@@ -325,7 +409,7 @@ while running:
                         fading = True
                         fade_direction = "out"
                         fade = 0
-                        next_state = "title"
+                        next_state = "selection"
                     elif event.key == pygame.K_ESCAPE:
                         running = False
                     continue
@@ -479,6 +563,34 @@ while running:
         leave_text = font_Small.render("Press ESC to Quit", True, BLACK)
         leave_text.set_alpha(change)
         screen.blit(leave_text, (25, 25))
+    
+    elif state == "tutorial":
+        screen.fill(TITLE)
+        screen.blit(scaled_tutorial, (0, 0))
+
+        text_time += text_speed
+        change = (math.sin(text_time) + 1) / 2 * 255
+        tutorial_text = font_Small.render("Press Enter to Start Game", True, BLACK)
+        tutorial_text.set_alpha(change)
+        screen.blit(tutorial_text, (WIDTH//2 - tutorial_text.get_width()//2, HEIGHT - 50))
+
+        leave_text = font_Small.render("Press ESC to Quit", True, BLACK)
+        leave_text.set_alpha(change)
+        screen.blit(leave_text, (25, 1000))
+
+    elif state == "selection":
+        screen.fill(TITLE)
+        screen.blit(scaled_selection, (0, 0))
+
+        text_time += text_speed
+        change = (math.sin(text_time) + 1) / 2 * 255
+        selection_text = font_Small.render("Press 1, 2, or 3 to Select Map", True, BLACK)
+        selection_text.set_alpha(change)
+        screen.blit(selection_text, (WIDTH//2 - selection_text.get_width()//2, HEIGHT - 50))
+
+        leave_text = font_Small.render("Press ESC to Quit", True, BLACK)
+        leave_text.set_alpha(change)
+        screen.blit(leave_text, (25, 1000))
 
     elif state == "game":
         if Turn % 2 == 0:
@@ -560,13 +672,13 @@ while running:
         else:
             winner_text = "It's a Draw!"
             color = WHITE
-        pygame.draw.rect(screen, TITLE, (WIDTH//2 - 325, HEIGHT//2 - 75, 650, 175))
-        pygame.draw.rect(screen, BLACK, (WIDTH//2 - 325, HEIGHT//2 - 75, 650, 175), width=5)
+        pygame.draw.rect(screen, TITLE, (WIDTH//2 - 340, HEIGHT//2 - 75, 680, 175))
+        pygame.draw.rect(screen, BLACK, (WIDTH//2 - 340, HEIGHT//2 - 75, 680, 175), width=5)
         text = font_Large.render(winner_text, True, color)
         screen.blit(text, (WIDTH//2 - text.get_width()//2, HEIGHT//2 - 50))
         cause_text = font_Small.render(f"Cause: {cause}", True, BLACK)
         screen.blit(cause_text, (WIDTH//2 - cause_text.get_width()//2, HEIGHT//2 + 10))
-        restart_text = font_Small.render("Press Enter to Return to Title or ESC to Quit", True, BLACK)
+        restart_text = font_Small.render("Press Enter to Return to Selection or ESC to Quit", True, BLACK)
         screen.blit(restart_text, (WIDTH//2 - restart_text.get_width()//2, HEIGHT//2 + 50))
 
     #run the fade
