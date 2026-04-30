@@ -176,12 +176,13 @@ class player(pygame.sprite.Sprite):
 class shell:
     def __init__(self, row, col, row_change, col_change, team):
         global game_over, winner, cause
+        self.row = row
+        self.col = col
         self.row_change = row_change
         self.col_change = col_change
-        self.row = row + row_change
-        self.col = col + col_change
         self.team = team
         self.active = True
+        self.justspawned = True
 
         #checks to prevent shells from spawning in walls, first one checks bounds
         if not (0 <= self.row < num_rows and 0 <= self.col < num_cols):
@@ -209,6 +210,10 @@ class shell:
     #function for shell traveling
     def move(self):
         global game_over, winner, cause
+
+        if self.justspawned:
+            self.justspawned = False
+            return True
         
         new_row = self.row + self.row_change
         new_col = self.col + self.col_change
@@ -482,48 +487,48 @@ while running:
                 elif event.key == pygame.K_UP:
                     if Turn % 2 == 0:
                         player1.direction = (-1, 0)
-                        s = shell(player1.row, player1.col, -1, 0, 1)
+                        s = shell(player1.row - 1, player1.col, -1, 0, 1)
                         if s.active:
                             shells.append(s)
                     else:
                         player2.direction = (-1, 0)
-                        s = shell(player2.row, player2.col, -1, 0, 2)
+                        s = shell(player2.row - 1, player2.col, -1, 0, 2)
                         if s.active:
                             shells.append(s)
                     Turn += 1
                 elif event.key == pygame.K_LEFT:
                     if Turn % 2 == 0:
                         player1.direction = (0, -1)
-                        s = shell(player1.row, player1.col, 0, -1, 1)
+                        s = shell(player1.row, player1.col - 1, 0, -1, 1)
                         if s.active:
                             shells.append(s)
                     else:
                         player2.direction = (0, -1)
-                        s = shell(player2.row, player2.col, 0, -1, 2)
+                        s = shell(player2.row, player2.col - 1, 0, -1, 2)
                         if s.active:
                             shells.append(s)
                     Turn += 1
                 elif event.key == pygame.K_RIGHT:
                     if Turn % 2 == 0:
                         player1.direction = (0, 1)
-                        s = shell(player1.row, player1.col, 0, 1, 1)
+                        s = shell(player1.row, player1.col + 1, 0, 1, 1)
                         if s.active:
                             shells.append(s)
                     else:
                         player2.direction = (0, 1)
-                        s = shell(player2.row, player2.col, 0, 1, 2)
+                        s = shell(player2.row, player2.col + 1, 0, 1, 2)
                         if s.active:
                             shells.append(s)
                     Turn += 1
                 elif event.key == pygame.K_DOWN:
                     if Turn % 2 == 0:
                         player1.direction = (+1, 0)
-                        s = shell(player1.row, player1.col, +1, 0, 1)
+                        s = shell(player1.row + 1, player1.col, +1, 0, 1)
                         if s.active:
                             shells.append(s)
                     else:
                         player2.direction = (+1, 0)
-                        s = shell(player2.row, player2.col, +1, 0, 2)
+                        s = shell(player2.row + 1, player2.col, +1, 0, 2)
                         if s.active:
                             shells.append(s)
                     Turn += 1
@@ -536,10 +541,7 @@ while running:
             current_team = 2
         new_shells = []
         for s in shells:
-            if s.team == current_team:
-                if s.move():
-                    new_shells.append(s)
-            else:
+            if s.move():
                 new_shells.append(s)
         shells = new_shells
         for m in mines:
