@@ -265,6 +265,18 @@ class shell:
             winner = 1
             cause = "Shell"
             return False
+        
+        # check for shell collision
+        if attack_grid[new_row][new_col] == 3:
+
+            # remove the other shell
+            for other in shells:
+                if other.row == new_row and other.col == new_col:
+                    other.active = False
+                    break
+
+            attack_grid[new_row][new_col] = 0
+            return False
 
         self.row = new_row
         self.col = new_col
@@ -561,11 +573,34 @@ while running:
             current_team = 1
         else:
             current_team = 2
+        # move shells
         new_shells = []
+
         for s in shells:
-            if s.move():
+            if s.active and s.move():
                 new_shells.append(s)
-        shells = new_shells
+
+        # detect shell-on-shell collisions
+        shell_positions = {}
+
+        for s in new_shells:
+            pos = (s.row, s.col)
+
+            if pos in shell_positions:
+                # another shell already exists here
+                other = shell_positions[pos]
+
+                # remove both shells from attack grid
+                attack_grid[s.row][s.col] = 0
+
+                # mark both shells for deletion
+                other.active = False
+                s.active = False
+            else:
+                shell_positions[pos] = s
+
+        # keep only active shells
+        shells = [s for s in new_shells if s.active]
         for m in mines:
             if m.team == current_team:
                 m.delay += 1
