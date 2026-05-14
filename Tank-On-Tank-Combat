@@ -183,6 +183,8 @@ class shell:
         self.team = team
         self.active = True
         self.justspawned = True
+        self.bounces = 0
+        self.max_bounces = 2
 
         #checks to prevent shells from spawning in walls, first one checks bounds
         if not (0 <= self.row < num_rows and 0 <= self.col < num_cols):
@@ -225,9 +227,29 @@ class shell:
         if not (0 <= new_row < num_rows and 0 <= new_col < num_cols):
             return False
 
-        #check for walls
+                #check for walls
         if game_grid[new_row][new_col] == 1:
-            return False
+
+            # bounce limit reached
+            if self.bounces >= self.max_bounces:
+                return False
+
+            self.bounces += 1
+
+            # reverse direction
+            self.row_change *= -1
+            self.col_change *= -1
+
+            # recalculate next position after bounce
+            new_row = self.row + self.row_change
+            new_col = self.col + self.col_change
+
+            # prevent bouncing into another wall or out of bounds
+            if not (0 <= new_row < num_rows and 0 <= new_col < num_cols):
+                return False
+
+            if game_grid[new_row][new_col] == 1:
+                return False
         
         #check for players
         if attack_grid[new_row][new_col] == 1:
